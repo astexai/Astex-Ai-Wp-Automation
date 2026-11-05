@@ -1,0 +1,69 @@
+{
+  "version": "6.0",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "DETAILS": []
+  },
+  "screens": [
+    {
+      "id": "DETAILS",
+      "title": "Your Details",
+      "terminal": true,
+      "success": true,
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "details_form",
+            "children": [
+              {
+                "type": "TextInput",
+                "name": "full_name",
+                "label": "Name",
+                "input-type": "text",
+                "required": true
+              },
+              {
+                "type": "TextInput",
+                "name": "contact_number",
+                "label": "Contact Number",
+                "input-type": "phone",
+                "helper-text": "With country code, for example +91 98765 43210",
+                "required": true
+              },
+              {
+                "type": "TextInput",
+                "name": "city",
+                "label": "City",
+                "input-type": "text",
+                "required": true
+              },
+              {
+                "type": "TextInput",
+                "name": "business_name",
+                "label": "Business Name",
+                "input-type": "text",
+                "required": true
+              },
+              {
+                "type": "Footer",
+                "label": "Submit",
+                "on-click-action": {
+                  "name": "complete",
+                  "payload": {
+                    "full_name": "${form.full_name}",
+                    "contact_number": "${form.contact_number}",
+                    "city": "${form.city}",
+                    "business_name": "${form.business_name}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
