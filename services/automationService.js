@@ -9,7 +9,7 @@ import { startNewInquiry } from './leadService';
 const CALL_US_BUTTON = { id: 'call_us', title: 'Call Us' };
 const RESTART_BUTTON = { id: 'restart', title: 'Restart' };
 const DEMO_BUTTONS = [
-  { id: 'demo_yes', title: 'Yes, Show Me the Demo' },
+  { id: 'demo_yes', title: 'Yes, Show Demo' },
   { id: 'demo_no', title: 'No, Skip Demo' },
 ];
 
@@ -242,7 +242,8 @@ async function handleDailyLeads(ctx) {
 
 async function handlePricing(ctx) {
   const { lead, conversation, message } = ctx;
-  if (message.replyId === 'price_yes') {
+  const replyText = String(message.text || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (message.replyId === 'price_yes' || replyText === 'yesimcomfortable') {
     lead.pricingComfortable = true;
     if (lead.leadStatus === 'New Lead') lead.leadStatus = 'Qualified';
     return enterStep(lead, conversation, 'DEMO_OFFER');

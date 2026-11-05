@@ -4,6 +4,8 @@ import { connectDB } from '@/lib/mongodb';
 import { requireUser, jsonError, parsePagination } from '@/lib/apiAuth';
 import { istToInstant, instantToIstDateInput } from '@/lib/format';
 import Consultation, { CONSULTATION_STATUSES } from '@/models/Consultation';
+import Lead from '@/models/Lead';
+import { notifyConsultationChange } from '@/services/consultationService';
 
 export const runtime = 'nodejs';
 
@@ -48,6 +50,39 @@ export async function GET(request) {
   });
 }
 
-export async function POST() {
-  return jsonError('Consultations are created from WhatsApp conversations', 405);
+export async function POST(request) {
+  const { error } = await requireUser();
+  if (error) return error;
+
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== 'object') return jsonError('Invalid request body', 400);
+  if (!mongoose.Types.ObjectId.isValid(body.leadId)) return jsonError('Select a valid lead', 400);
+  if (!DATE_RX.test(body.date || '') || !TIME_RX.test(body.time || '')) {
+    return jsonError('Enter a valid date and time', 400);
+  }
+
+  const requestedDate = istToInstant(body.date, body.time);
+  if (instantToIstDateInput(requestedDate) !== body.date || requestedDate.getTime() <= Date.now()) {
+    return jsonError('Consultation date and time must be in the future', 400);
+  }
+
+  await connectDB();
+  const lead = await Lead.findById(body.leadId);
+  if (!lead) return jsonError('Lead not found', 404);
+
+  const consultation = await Consultation.create({
+    leadId: lead._id,
+    requestedDate,
+    requestedTime: body.time,
+    confirmedDate: requestedDate,
+    confirmedTime: body.time,
+    meetingWith: process.env.FOUNDER_NAME || 'Aditya Patel',
+    status: 'Scheduled',
+  });
+  const notificationError = await notifyConsultationChange(
+    lead,
+    { status: 'Pending', confirmedDate: null, confirmedTime: '' },
+    { status: consultation.status, confirmedDate: consultation.confirmedDate, confirmedTime: consultation.confirmedTime }
+  );
+  return NextResponse.json({ consultation, notificationError }, { status: 201 });
 }

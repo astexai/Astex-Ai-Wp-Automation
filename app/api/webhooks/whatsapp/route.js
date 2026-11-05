@@ -106,7 +106,7 @@ async function handleInboundMessage(msg) {
       lead,
       conversation,
       message: { id: msg.id, type: msg.type, text: content.text, replyId: content.replyId, flowResponse: content.flowResponse || null },
-      isNew,
+      isNewLead: isNew,
     });
   } catch (err) {
     console.error('Automation failed for message', msg.id, err);

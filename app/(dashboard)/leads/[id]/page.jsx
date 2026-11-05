@@ -46,21 +46,17 @@ function InquiryTab({ inquiries }) {
     <div className="space-y-6">
       {inquiries.map((inquiry, index) => (
         <Card key={inquiry._id} title={`Inquiry ${inquiries.length - index} · started ${formatDateTime(inquiry.createdAt)}`}>
-          <Row label="Full Name" value={inquiry.fullName} />
-          <Row label="Contact Number" value={inquiry.contactNumber} />
-          <Row label="City" value={inquiry.city} />
-          <Row label="Business Name" value={inquiry.businessName} />
-          <Row label="Business Type" value={inquiry.businessType} wide />
-          <Row label="Services Required" value={list(inquiry.requiredServices)} wide />
-          <Row label="Lead Generation Sources" value={list(inquiry.leadSources)} wide />
+          <Row label="Business Type" value={inquiry.businessType} />
+          <Row label="Services Required" value={list(inquiry.requiredServices)} />
+          <Row label="Lead Generation Sources" value={list(inquiry.leadSources)} />
           <Row label="Current Daily Leads" value={inquiry.dailyLeadVolume} />
-          <Row label="Current Challenges" value={list(inquiry.currentChallenges)} wide />
+          <Row label="Current Challenges" value={list(inquiry.currentChallenges)} />
           <Row label="Pricing Comfortable" value={yesNo(inquiry.pricingComfortable)} />
           <Row label="Demo Requested" value={yesNo(inquiry.demoRequested)} />
           <Row label="Demo Sent" value={yesNo(inquiry.demoSent)} />
           <Row label="Demo Watched" value={yesNo(inquiry.demoWatched)} />
           <Row label="Implementation Plan" value={inquiry.implementationPlan} />
-          <Row label="Founder Consultation Requested" value={yesNo(inquiry.founderConsultationRequested)} wide />
+          <Row label="Founder Consultation Requested" value={yesNo(inquiry.founderConsultationRequested)} />
         </Card>
       ))}
     </div>

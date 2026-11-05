@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CalendarCheck, Clock, CheckCircle2, Pencil, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { CalendarCheck, Clock, CheckCircle2, Pencil, Loader2, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { apiRequest } from '@/lib/clientApi';
 import { formatConsultationDate, formatConsultationTime, instantToIstDateInput, instantToIstTimeInput } from '@/lib/format';
 import StatusBadge from '@/components/common/StatusBadge';
@@ -43,6 +43,110 @@ function validate(form) {
   if (form.date && !form.time) return 'Please add a time for the consultation.';
   if (form.time && !form.date) return 'Please add a date for the consultation.';
   return '';
+}
+
+function NewConsultationModal({ onClose, onCreated }) {
+  const [leads, setLeads] = useState([]);
+  const [loadingLeads, setLoadingLeads] = useState(true);
+  const [form, setForm] = useState({ leadId: '', date: '', time: '' });
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadLeads() {
+      try {
+        const firstPage = await apiRequest('/api/leads?page=1&limit=100');
+        const remainingPages = await Promise.all(
+          Array.from({ length: Math.max(0, firstPage.pages - 1) }, (_, index) =>
+            apiRequest(`/api/leads?page=${index + 2}&limit=100`)
+          )
+        );
+        setLeads([...(firstPage.items || []), ...remainingPages.flatMap((page) => page.items || [])]);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoadingLeads(false);
+      }
+    }
+    loadLeads();
+  }, []);
+
+  async function save(event) {
+    event.preventDefault();
+    if (!form.leadId || !form.date || !form.time) {
+      setError('Select a lead, date, and time.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      const res = await apiRequest('/api/consultations', { method: 'POST', body: form });
+      onCreated(res.notificationError || '');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Modal open title="Schedule Consultation" onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
+        <div>
+          <label htmlFor="consultation-lead" className="mb-1.5 block text-sm font-medium">Lead Name</label>
+          <select
+            id="consultation-lead"
+            className={inputClass}
+            value={form.leadId}
+            onChange={(e) => setForm((prev) => ({ ...prev, leadId: e.target.value }))}
+            disabled={loadingLeads || saving}
+            required
+          >
+            <option value="">{loadingLeads ? 'Loading leads...' : 'Select a lead'}</option>
+            {leads.map((lead) => (
+              <option key={lead._id} value={lead._id}>
+                {lead.fullName || 'Unnamed lead'}
+              </option>
+            ))}
+          </select>
+          {!loadingLeads && leads.length === 0 && !error && (
+            <p className="mt-1 text-xs text-neutral-500">No leads are available to schedule.</p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="consultation-date" className="mb-1.5 block text-sm font-medium">Consultation Date (IST)</label>
+          <input
+            id="consultation-date"
+            type="date"
+            className={inputClass}
+            value={form.date}
+            onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))}
+            disabled={saving}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="consultation-time" className="mb-1.5 block text-sm font-medium">Consultation Time (IST)</label>
+          <input
+            id="consultation-time"
+            type="time"
+            className={inputClass}
+            value={form.time}
+            onChange={(e) => setForm((prev) => ({ ...prev, time: e.target.value }))}
+            disabled={saving}
+            required
+          />
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="flex justify-end gap-3 pt-2">
+          <button type="button" onClick={onClose} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium hover:bg-neutral-50">Cancel</button>
+          <button type="submit" disabled={saving || loadingLeads || leads.length === 0} className="inline-flex items-center gap-2 rounded-lg bg-[#FF4D00] px-4 py-2 text-sm font-medium text-white hover:bg-[#E64500] disabled:opacity-60">
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />} Add Consultation
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
 }
 
 function EditConsultationModal({ consultation, onClose, onSaved }) {
@@ -136,6 +240,7 @@ export default function ConsultationsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState(null);
+  const [adding, setAdding] = useState(false);
   const [notice, setNotice] = useState(null);
 
   const load = useCallback(() => {
@@ -165,6 +270,15 @@ export default function ConsultationsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Consultations</h1>
         <p className="mt-1 text-sm text-neutral-500">Review requests, confirm meeting details and keep leads informed.</p>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => setAdding(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#FF4D00] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#E64500]"
+        >
+          <Plus className="h-4 w-4" /> Schedule Consultation
+        </button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -257,6 +371,18 @@ export default function ConsultationsPage() {
 
       {editing && (
         <EditConsultationModal consultation={editing} onClose={() => setEditing(null)} onSaved={handleSaved} />
+      )}
+      {adding && (
+        <NewConsultationModal
+          onClose={() => setAdding(false)}
+          onCreated={(notificationError) => {
+            setAdding(false);
+            setNotice(notificationError
+              ? { type: 'warning', text: `Consultation scheduled, but the WhatsApp notification failed: ${notificationError}` }
+              : { type: 'success', text: 'Consultation scheduled and the lead has been notified.' });
+            load();
+          }}
+        />
       )}
     </div>
   );
