@@ -19,7 +19,7 @@ export const DETAILS_INVALID = 'Some of the details look incomplete. Please fill
 
 export const DETAIL_PROMPTS = {
   fullName: 'Please type your full name.',
-  contactNumber: 'Please type your contact number with country code (for example: +91 98765 43210).',
+  contactNumber: 'Please type your contact number (for example: 9098343508).',
   city: 'Please type the city where your business operates.',
   businessName: 'Please type your business name.',
 };
@@ -31,16 +31,16 @@ export const SERVICE_OPTIONS = [
   'WhatsApp Automation',
   'Lead Management CRM',
   'Automated Follow-ups',
-  'Increase Site Visits & Sales',
-  'Complete Business Automation',
+  'Increase Site Visits',
+  'Complete Business Automation (Leads generation to Site Visits)',
 ];
 
 export const SOURCE_OPTIONS = [
   'Facebook & Instagram Ads',
   'Instagram Organic',
   'Google Ads',
-  'Property Portals (99acres, Magicbricks, etc.)',
-  'Website / Google Business',
+  'Property Portals (99acres, Magicbricks, Housing.com, etc.)',
+  'Website / Google Business Profile',
   'References / Channel Partners',
   'Other Sources',
 ];
@@ -49,13 +49,11 @@ export const DAILY_LEAD_OPTIONS = ['0–5 Leads', '5–15 Leads', '15–30 Leads
 
 export const CHALLENGE_OPTIONS = [
   'Not Getting Enough Quality Leads',
-  'High Cost Per Lead',
   'Delayed Response to Enquiries',
   'Leads Not Converting into Site Visits',
   'Too Many Unqualified Leads',
   'Difficulty Managing & Following Up',
   'Missing Potential Leads',
-  'Difficulty Closing Deals',
 ];
 
 export const SERVICE_BODY = 'What are you mainly looking to improve in your business?';
@@ -101,8 +99,9 @@ export const CONSULTATION_DATE_INVALID =
 export const CONSULTATION_DATE_PAST =
   'That date and time has already passed. Please send another preferred date and time, for example: 5 Nov 2026, 11:00 AM';
 
-export const CONSULTATION_RECEIVED =
-  "Thank you! We've received your preferred date and time. Our team will review availability and confirm your consultation shortly.";
+export function consultationReceived(dateText, timeText) {
+  return `🎉 Your free consultation request has been successfully submitted!\n\n📅 Preferred Date: ${dateText}\n⏰ Preferred Time: ${timeText}\n\nOur team will review your requested date and time and confirm your consultation through WhatsApp shortly.\n\nThank you for choosing Astex AI! 🚀`;
+}
 
 export const RESTART_MESSAGE = "No problem! Let's start again. 😊";
 
@@ -124,16 +123,16 @@ const BUSINESS_CONTACT_NUMBER = '+91 9098343508';
 
 export const CALL_US_REPLY = `You can reach the Astex AI team on ${BUSINESS_CONTACT_NUMBER}.`;
 
+// NOTE: WhatsApp list row titles must be <= 24 characters and descriptions <= 72.
 const SHORT_LABELS = {
-  'Increase Site Visits & Sales': 'Increase Site Visits',
-  'Complete Business Automation': 'Full Business Automation',
-  'Property Portals (99acres, Magicbricks, etc.)': 'Property Portals',
-  'Website / Google Business': 'Website / Google Biz',
+  'Complete Business Automation (Leads generation to Site Visits)': 'Full Business Automation',
+  'Property Portals (99acres, Magicbricks, Housing.com, etc.)': 'Property Portals',
+  'Website / Google Business Profile': 'Website / GBP',
   'References / Channel Partners': 'References / Partners',
-  'Not Getting Enough Quality Leads': 'Not Enough Quality Leads',
+  'Not Getting Enough Quality Leads': 'No Quality Leads',
   'Delayed Response to Enquiries': 'Delayed Enquiry Response',
-  'Leads Not Converting into Site Visits': 'Leads Not Converting',
-  'Too Many Unqualified Leads': 'Too Many Unqualified',
+  'Leads Not Converting into Site Visits': 'Low Site Visit Bookings',
+  'Too Many Unqualified Leads': 'No Qualification System',
   'Difficulty Managing & Following Up': 'Difficulty Following Up',
 };
 

@@ -3,6 +3,7 @@ import { isValidPhone, normalizePhone } from '@/lib/phone';
 import * as out from './outboundService';
 import * as C from './flowContent';
 import { parseRequestedDateText } from './consultationService';
+import { formatConsultationDate, formatConsultationTime } from '@/lib/format';
 import { findDemoVideo } from '@/lib/demoVideo';
 import { startNewInquiry } from './leadService';
 
@@ -347,7 +348,7 @@ async function handleConsultationDate(ctx) {
   lead.qualificationStatus = 'Completed';
   lead.conversationCompleted = true;
   goTo(lead, conversation, 'COMPLETED');
-  return out.sendText(lead, C.CONSULTATION_RECEIVED);
+  return out.sendText(lead, C.consultationReceived(formatConsultationDate(parsed.instant), formatConsultationTime(parsed.hm)));
 }
 
 async function handleCallUs(lead) {

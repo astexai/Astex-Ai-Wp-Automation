@@ -53,12 +53,12 @@ function founderDetails() {
 }
 
 function scheduleLines(consultation) {
-  return `📅 Date: ${formatConsultationDate(consultation.confirmedDate)}\n\n⏰ Time: ${formatConsultationTime(consultation.confirmedTime)}\n\n🔗 Meeting Link: ${MEETING_LINK}`;
+  return `📅 Date: ${formatConsultationDate(consultation.confirmedDate)}\n⏰ Time: ${formatConsultationTime(consultation.confirmedTime)}\n🔗 Meeting Link: ${MEETING_LINK}`;
 }
 
 function confirmationText(consultation) {
   const founder = founderDetails();
-  return `🎉 Great News! Your Free Consultation Has Been Successfully Scheduled!\n\nYour meeting details are below:\n\n${scheduleLines(consultation)}\n\n👤 Meeting With:\n\n${founder.name}\n\n${founder.title}\n\nDuring this consultation, we'll discuss your business requirements, current challenges and how Astex AI can help you improve your lead generation, automate operations and grow your Real Estate business.\n\n📞 We look forward to speaking with you!\n\nThank you for choosing Astex AI. 🚀`;
+  return `🎉 Great News! Your Free Consultation Has Been Successfully Scheduled!\n\nYour meeting details are below:\n\n${scheduleLines(consultation)}\n\n👤 Meeting With:\n${founder.name}\n${founder.title}\n\nDuring this consultation, we'll discuss your business requirements, current challenges and how Astex AI can help you improve your lead generation, automate operations and grow your Real Estate business.\n\n📞 We look forward to speaking with you!\n\nThank you for choosing Astex AI. 🚀`;
 }
 
 function rescheduleText(consultation) {
